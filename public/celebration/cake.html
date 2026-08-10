@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Birthday Cake</title>
+ <style>
+  /* ── Reset ── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: radial-gradient(ellipse at 50% 60%, #1a0a2e 0%, #0d0d0d 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── Scene ── */
+#scene {
+  position: relative;
+  width: 320px;
+  height: 440px;
+}
+
+canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* ── Plate ── */
+#plate-wrap {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 230px;
+  opacity: 0;
+}
+#plate-top {
+  width: 230px;
+  height: 14px;
+  background: linear-gradient(180deg, #eeeef8 0%, #c8c8dc 50%, #a8a8c0 100%);
+  border-radius: 50%;
+  box-shadow: 0 2px 12px #0009, inset 0 2px 4px #fff5;
+}
+#plate-rim {
+  width: 210px;
+  height: 7px;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #b0b0c8, #888898);
+  border-radius: 0 0 50% 50%;
+  box-shadow: 0 4px 8px #0007;
+}
+
+/* ── Cake Layers (common) ── */
+.clayer {
+  position: absolute;
+  left: 50%;
+  opacity: 0;
+  transform: translateX(-50%) translateY(-520px);
+}
+
+/* Sponge 1 - bottom */
+#sponge1 {
+  width: 186px;
+  height: 46px;
+  bottom: 51px;
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 3px, #f0e8d818 3px, #f0e8d818 4px),
+    linear-gradient(180deg, #fdf6e8 0%, #f5e8cc 45%, #ede0bc 75%, #e4d4aa 100%);
+  border-radius: 5px 5px 3px 3px;
+  border: 1.5px solid #d4c49a;
+  box-shadow: inset 0 3px 6px #fff5, inset 0 -3px 6px #c8a87018, 0 2px 8px #0007;
+}
+
+/* Strawberry cream */
+#cream1 {
+  width: 192px;
+  height: 14px;
+  bottom: 95px;
+  background: linear-gradient(180deg, #f06292 0%, #e91e63 50%, #c2185b 100%);
+  border-radius: 3px;
+  box-shadow: 0 1px 6px #e91e6388, inset 0 1px 3px #ff8fab55;
+  clip-path: polygon(
+    0% 30%, 2% 80%, 5% 100%, 8% 75%, 12% 100%, 16% 65%, 20% 100%,
+    25% 80%, 30% 100%, 35% 65%, 40% 100%, 46% 80%, 52% 100%,
+    58% 70%, 64% 100%, 70% 80%, 76% 100%, 81% 65%, 86% 100%,
+    91% 75%, 95% 100%, 98% 80%, 100% 40%,
+    100% 0%, 0% 0%
+  );
+}
+
+/* Strawberry pieces */
+.sberry {
+  bottom: 100px;
+  width: 10px;
+  height: 9px;
+  background: radial-gradient(ellipse at 40% 30%, #ff8a80, #d32f2f);
+  border-radius: 50% 50% 45% 45%;
+  clip-path: polygon(50% 0%, 100% 60%, 80% 100%, 20% 100%, 0% 60%);
+  opacity: 0;
+  box-shadow: 0 1px 3px #0006;
+}
+.sberry::after {
+  content: '';
+  position: absolute;
+  top: -3px; left: 3px;
+  width: 4px; height: 4px;
+  background: #2e7d32;
+  border-radius: 0 50% 0 50%;
+  transform: rotate(-30deg);
+}
+#sb1 { left: calc(50% - 50px); }
+#sb2 { left: calc(50% - 18px); }
+#sb3 { left: calc(50% + 16px); }
+#sb4 { left: calc(50% + 44px); }
+
+/* Sponge 2 - middle */
+#sponge2 {
+  width: 168px;
+  height: 40px;
+  bottom: 107px;
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 3px, #f0e8d818 3px, #f0e8d818 4px),
+    linear-gradient(180deg, #fdf6e8 0%, #f5e8cc 45%, #ede0bc 75%, #e4d4aa 100%);
+  border-radius: 5px 5px 3px 3px;
+  border: 1.5px solid #d4c49a;
+  box-shadow: inset 0 3px 6px #fff5, inset 0 -3px 6px #c8a87018, 0 2px 8px #0007;
+}
+
+/* Dark chocolate cream */
+#cream2 {
+  width: 174px;
+  height: 14px;
+  bottom: 145px;
+  background: linear-gradient(180deg, #3e1f0a 0%, #1a0a04 55%, #3e1f0a 100%);
+  border-radius: 3px;
+  box-shadow: 0 1px 6px #0009, inset 0 1px 3px #ffffff15;
+  clip-path: polygon(
+    0% 35%, 3% 85%, 7% 100%, 11% 70%, 15% 100%, 19% 75%, 24% 100%,
+    29% 65%, 34% 100%, 39% 75%, 44% 100%, 50% 65%, 56% 100%,
+    62% 75%, 68% 100%, 74% 65%, 80% 100%, 85% 75%, 90% 100%,
+    94% 70%, 97% 100%, 100% 50%,
+    100% 0%, 0% 0%
+  );
+}
+
+/* Top whipped swirl */
+#top-swirl {
+  width: 168px;
+  height: 16px;
+  bottom: 157px;
+  background: linear-gradient(180deg, #fff8f0 0%, #f0e0c4 100%);
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  box-shadow: inset 0 3px 8px #fff7, 0 1px 4px #0004;
+  clip-path: polygon(
+    3% 100%, 0% 55%, 4% 15%, 9% 55%, 14% 5%, 19% 50%,
+    24% 0%, 29% 45%, 34% 5%, 39% 50%, 44% 0%, 50% 48%,
+    56% 0%, 62% 50%, 67% 5%, 72% 48%, 77% 0%, 82% 50%,
+    87% 10%, 92% 55%, 97% 15%, 100% 55%, 97% 100%
+  );
+  opacity: 0;
+}
+
+/* Decoration dots */
+.cdot {
+  position: absolute;
+  bottom: 158px;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0);
+}
+#dot1 { left: calc(50% - 58px); background: #ff6bdf; }
+#dot2 { left: calc(50% - 34px); background: #ffd93d; }
+#dot3 { left: calc(50% - 6px);  background: #6bcb77; }
+#dot4 { left: calc(50% + 22px); background: #4d96ff; }
+#dot5 { left: calc(50% + 48px); background: #ff6b6b; }
+
+/* ── Candle ── */
+#candle-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: 171px;
+  transform: translateX(-50%) translateY(-480px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  z-index: 10;
+}
+#candle-body {
+  width: 13px; height: 40px;
+  background: linear-gradient(135deg,
+    #ff8fab 0%, #ff6b9d 25%, #e91e8c 50%,
+    #c2185b 70%, #ff6b9d 90%, #ff8fab 100%
+  );
+  border-radius: 4px 4px 3px 3px;
+  box-shadow: inset 2px 0 4px #ffffff44, inset -2px 0 4px #00000033, 0 2px 8px #ff6b9d55;
+  position: relative;
+  overflow: hidden;
+}
+#candle-body::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px, transparent 5px,
+    #ffffff1a 5px, #ffffff1a 7px
+  );
+  border-radius: 4px 4px 3px 3px;
+}
+#candle-wick {
+  width: 2px; height: 9px;
+  background: linear-gradient(180deg, #eee, #555);
+  border-radius: 1px;
+  margin-bottom: 0;
+}
+
+/* ── Flame ── */
+#flame-container {
+  position: relative;
+  width: 22px; height: 30px;
+}
+#flame-outer {
+  position: absolute;
+  bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 18px; height: 26px;
+  background: radial-gradient(ellipse at 50% 85%,
+    #fff 0%, #ffe066 20%, #ffaa00 50%, #ff4400 85%, transparent 100%
+  );
+  border-radius: 50% 50% 30% 30%;
+  opacity: 0;
+  filter: blur(0.7px);
+  animation: fl1 0.42s ease-in-out infinite alternate;
+  transform-origin: 50% 100%;
+}
+#flame-inner {
+  position: absolute;
+  bottom: 2px; left: 50%;
+  transform: translateX(-50%);
+  width: 9px; height: 14px;
+  background: radial-gradient(ellipse at 50% 80%,
+    #fff 0%, #fff9c4 55%, #ffe066 100%
+  );
+  border-radius: 50% 50% 30% 30%;
+  opacity: 0;
+  animation: fl2 0.33s ease-in-out infinite alternate;
+  transform-origin: 50% 100%;
+}
+#flame-glow {
+  position: absolute;
+  bottom: -5px; left: 50%;
+  transform: translateX(-50%);
+  width: 38px; height: 38px;
+  background: radial-gradient(circle, #ff990055 0%, #ff440018 55%, transparent 70%);
+  border-radius: 50%;
+  opacity: 0;
+  animation: fl3 0.48s ease-in-out infinite alternate;
+}
+@keyframes fl1 {
+  0%   { transform: translateX(-50%) scaleX(1)    scaleY(1)    rotate(-3deg); }
+  100% { transform: translateX(-50%) scaleX(0.8)  scaleY(1.13) rotate(3deg);  }
+}
+@keyframes fl2 {
+  0%   { transform: translateX(-50%) scaleX(1)    rotate(2deg);  }
+  100% { transform: translateX(-50%) scaleX(0.88) scaleY(1.1) rotate(-2deg); }
+}
+@keyframes fl3 {
+  0%   { transform: translateX(-50%) scale(1);   opacity: 0.7; }
+  100% { transform: translateX(-50%) scale(1.3); opacity: 0.4; }
+}
+
+/* ── Fire Drop ── */
+#firedrop {
+  position: absolute;
+  width: 11px; height: 17px;
+  border-radius: 50% 50% 30% 30%;
+  background: radial-gradient(ellipse at 50% 80%,
+    #fff 0%, #ffe066 30%, #ff6600 70%, #ff2200 100%
+  );
+  filter: blur(0.5px);
+  opacity: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  box-shadow: 0 0 10px #ff660099;
+}
+#firedrop::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 50%;
+  transform: translateX(-50%);
+  width: 3px; height: 18px;
+  background: linear-gradient(180deg, #ff660077, transparent);
+  border-radius: 2px;
+}
+
+/* ── Smoke ── */
+.smoke-p {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+}
+
+ </style>
+</head>
+<body>
+<div id="scene">
+  <canvas id="stars"></canvas>
+  <div id="plate-wrap">
+    <div id="plate-top"></div>
+    <div id="plate-rim"></div>
+  </div>
+  <div class="clayer" id="sponge1"></div>
+  <div class="clayer" id="cream1"></div>
+  <div class="clayer sberry" id="sb1"></div>
+  <div class="clayer sberry" id="sb2"></div>
+  <div class="clayer sberry" id="sb3"></div>
+  <div class="clayer sberry" id="sb4"></div>
+  <div class="clayer" id="sponge2"></div>
+  <div class="clayer" id="cream2"></div>
+  <div class="clayer" id="top-swirl"></div>
+  <div class="cdot" id="dot1"></div>
+  <div class="cdot" id="dot2"></div>
+  <div class="cdot" id="dot3"></div>
+  <div class="cdot" id="dot4"></div>
+  <div class="cdot" id="dot5"></div>
+  <div id="candle-wrap">
+    <div id="flame-container">
+      <div id="flame-glow"></div>
+      <div id="flame-outer"></div>
+      <div id="flame-inner"></div>
+    </div>
+    <div id="candle-wick"></div>
+    <div id="candle-body"></div>
+  </div>
+  <div id="firedrop"></div>
+</div>
+<script>
+  /* ═══════════════════════════════════════════
+   Birthday Cake Animation — script.js
+   Smooth drop (easeInOutCubic — no bounce/jump)
+═══════════════════════════════════════════ */
+
+/* ── Stars canvas ── */
+const cv = document.getElementById('stars');
+const cx = cv.getContext('2d');
+cv.width = 320; cv.height = 440;
+const stars = Array.from({ length: 45 }, () => ({
+  x:  Math.random() * 320,
+  y:  Math.random() * 440,
+  r:  0.5 + Math.random() * 1.4,
+  ph: Math.random() * Math.PI * 2,
+  sp: 0.018 + Math.random() * 0.028
+}));
+(function drawStars(t) {
+  cx.clearRect(0, 0, 320, 440);
+  stars.forEach(s => {
+    const a = 0.15 + 0.85 * Math.abs(Math.sin(s.ph + t * 0.001 * 60 * s.sp));
+    cx.beginPath();
+    cx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    cx.fillStyle = `rgba(255,255,255,${a})`;
+    cx.fill();
+  });
+  requestAnimationFrame(drawStars);
+})(0);
+
+
+/* ── Easing functions ── */
+// Smooth drop — no bounce, no jump
+function easeInOutCubic(t) {
+  return t < 0.5
+    ? 4 * t * t * t
+    : 1 - Math.pow(-2 * t + 2, 3) / 2;
+}
+// Soft settle — slight deceleration at end only
+function easeOutCubic(t) {
+  return 1 - Math.pow(1 - t, 3);
+}
+// Pop-in for dots
+function easeOutBack(t) {
+  return 1 + 2.70158 * Math.pow(t - 1, 3) + 1.70158 * Math.pow(t - 1, 2);
+}
+// Fire drop acceleration
+function easeInCubic(t) {
+  return t * t * t;
+}
+
+
+/* ── Helpers ── */
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+/**
+ * smoothDrop — element falls from top, lands smoothly, NO bounce/jump
+ * @param {HTMLElement} el
+ * @param {number} dur  — duration ms
+ */
+function smoothDrop(el, dur) {
+  return new Promise(res => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(-50%) translateY(-520px)';
+    const start = performance.now();
+    function frame(now) {
+      const t = Math.min(1, (now - start) / dur);
+      const e = easeInOutCubic(t);
+      el.style.transform = `translateX(-50%) translateY(${-520 + 520 * e}px)`;
+      el.style.opacity   = String(Math.min(1, t * 4));
+      if (t < 1) {
+        requestAnimationFrame(frame);
+      } else {
+        el.style.transform = 'translateX(-50%) translateY(0px)';
+        el.style.opacity   = '1';
+        res();
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+function popIn(el, dur) {
+  return new Promise(res => {
+    el.style.opacity   = '1';
+    el.style.transform = 'scale(0)';
+    const start = performance.now();
+    function frame(now) {
+      const t = Math.min(1, (now - start) / dur);
+      el.style.transform = `scale(${easeOutBack(t)})`;
+      if (t < 1) requestAnimationFrame(frame);
+      else { el.style.transform = 'scale(1)'; res(); }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+function fadeIn(el, dur) {
+  return new Promise(res => {
+    const start = performance.now();
+    function frame(now) {
+      const t = Math.min(1, (now - start) / dur);
+      el.style.opacity = String(t);
+      if (t < 1) requestAnimationFrame(frame);
+      else { el.style.opacity = '1'; res(); }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+function fadeOut(el, dur) {
+  return new Promise(res => {
+    const iv    = parseFloat(el.style.opacity || '1');
+    const start = performance.now();
+    function frame(now) {
+      const t = Math.min(1, (now - start) / dur);
+      el.style.opacity = String(iv * (1 - t));
+      if (t < 1) requestAnimationFrame(frame);
+      else { el.style.opacity = '0'; res(); }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+function dropFire(el, startY, endY, dur) {
+  return new Promise(res => {
+    el.style.top     = startY + 'px';
+    el.style.opacity = '1';
+    const start = performance.now();
+    function frame(now) {
+      const t = Math.min(1, (now - start) / dur);
+      el.style.top     = (startY + (endY - startY) * easeInCubic(t)) + 'px';
+      el.style.opacity = String(t < 0.82 ? 1 : 1 - (t - 0.82) / 0.18);
+      if (t < 1) requestAnimationFrame(frame);
+      else { el.style.opacity = '0'; res(); }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+function spawnSmoke(x, y) {
+  const scene = document.getElementById('scene');
+  const pts   = [];
+  for (let i = 0; i < 8; i++) {
+    const d  = document.createElement('div');
+    d.className = 'smoke-p';
+    const sz = 10 + Math.random() * 12;
+    d.style.cssText = `width:${sz}px;height:${sz}px;left:${x}px;top:${y}px;
+      background:radial-gradient(circle,#cccccc77,#cccccc00);`;
+    scene.appendChild(d);
+    pts.push({
+      el: d, x, y,
+      vx: (Math.random() - 0.5) * 1.3,
+      vy: -0.9 - Math.random() * 1.4,
+      life: 1, sz
+    });
+  }
+  return new Promise(res => {
+    function frame() {
+      let alive = false;
+      pts.forEach(p => {
+        if (p.life <= 0) return;
+        p.x += p.vx; p.y += p.vy; p.life -= 0.015;
+        p.el.style.left    = p.x + 'px';
+        p.el.style.top     = p.y + 'px';
+        p.el.style.opacity = String(Math.max(0, p.life * 0.55));
+        const s = p.sz * (1 + (1 - p.life) * 0.9);
+        p.el.style.width   = s + 'px';
+        p.el.style.height  = s + 'px';
+        if (p.life > 0) alive = true;
+      });
+      if (alive) requestAnimationFrame(frame);
+      else { pts.forEach(p => p.el.remove()); res(); }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+
+/* ── Main Animation Loop ── */
+async function run() {
+  const pw   = document.getElementById('plate-wrap');
+  const s1   = document.getElementById('sponge1');
+  const cr1  = document.getElementById('cream1');
+  const sbs  = ['sb1','sb2','sb3','sb4'].map(id => document.getElementById(id));
+  const s2   = document.getElementById('sponge2');
+  const cr2  = document.getElementById('cream2');
+  const tsw  = document.getElementById('top-swirl');
+  const dots = ['dot1','dot2','dot3','dot4','dot5'].map(id => document.getElementById(id));
+  const cw   = document.getElementById('candle-wrap');
+  const fo   = document.getElementById('flame-outer');
+  const fi   = document.getElementById('flame-inner');
+  const fg   = document.getElementById('flame-glow');
+  const fd   = document.getElementById('firedrop');
+
+  /* reset */
+  [pw, s1, cr1, ...sbs, s2, cr2, tsw, cw].forEach(el => el.style.opacity = '0');
+  [s1, cr1, ...sbs, s2, cr2, tsw, cw].forEach(el =>
+    el.style.transform = 'translateX(-50%) translateY(-520px)'
+  );
+  dots.forEach(d => { d.style.opacity = '0'; d.style.transform = 'scale(0)'; });
+  [fo, fi, fg].forEach(f => f.style.opacity = '0');
+  fd.style.opacity = '0';
+
+  await wait(400);
+
+  /* 1. Plate fade in */
+  pw.style.transform = 'translateX(-50%)';
+  await fadeIn(pw, 480);
+  await wait(150);
+
+  /* 2. Cake layers — smooth drop, no bounce */
+  await smoothDrop(s1,  700);   await wait(60);
+  await smoothDrop(cr1, 560);
+
+  /* strawberries appear with cream */
+  sbs.forEach((b, i) => {
+    b.style.transform = 'translateX(-50%) translateY(0px)';
+    setTimeout(() => { b.style.opacity = '1'; }, i * 80);
+  });
+  await wait(340);
+
+  await smoothDrop(s2,  700);   await wait(60);
+  await smoothDrop(cr2, 560);   await wait(60);
+  await smoothDrop(tsw, 560);
+
+  /* 3. Decoration dots pop */
+  for (const d of dots) { popIn(d, 260); await wait(55); }
+  await wait(260);
+
+  /* 4. Candle drops smoothly */
+  await smoothDrop(cw, 700);
+  await wait(360);
+
+  /* 5. Fire drop falls */
+  const scRect = document.getElementById('scene').getBoundingClientRect();
+  const cwRect = cw.getBoundingClientRect();
+  const fireEndY = cwRect.top - scRect.top + 4;
+  await dropFire(fd, 8, fireEndY, 900);
+
+  /* 6. Light flame */
+  fo.style.opacity = '1';
+  fi.style.opacity = '1';
+  fg.style.opacity = '0.75';
+
+  /* 7. Hold — enjoy the cake */
+  await wait(3200);
+
+  /* 8. Blow out */
+  await Promise.all([fadeOut(fo, 380), fadeOut(fi, 380), fadeOut(fg, 380)]);
+  spawnSmoke(160, cwRect.top - scRect.top - 10);
+  await wait(1100);
+
+  /* 9. Fade out everything top → bottom */
+  fadeOut(cw,  300);                            await wait(80);
+  fadeOut(tsw, 280); dots.forEach(d => fadeOut(d, 280)); await wait(80);
+  fadeOut(cr2, 260);                            await wait(80);
+  fadeOut(s2,  260);                            await wait(80);
+  sbs.forEach(b => fadeOut(b, 240));
+  fadeOut(cr1, 260);                            await wait(80);
+  fadeOut(s1,  260);                            await wait(300);
+  await fadeOut(pw, 380);
+
+  await wait(500);
+  /* The cake has been blown out. Do not replay it; continue to the memories. */
+  window.parent.postMessage({ type: 'birthday-cake-complete' }, window.location.origin);
+}
+
+run();
+
+</script>
+</body>
+</html>

@@ -77,6 +77,9 @@ const memoryNext = $('memoryNext');
 const memoryAgain = $('memoryAgain');
 const bgMusic = $('bgMusic');
 const musicToggle = $('musicToggle');
+const celebration = $('celebration');
+const crackersFrame = $('crackersFrame');
+const cakeFrame = $('cakeFrame');
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isRecord     = new URLSearchParams(location.search).has('record');
@@ -885,7 +888,32 @@ function armReplay(){
   requestAnimationFrame(() => replay.classList.add('is-shown'));
 }
 
-/* --- Act 5: photo memories ------------------------------------------------ */
+/* --- Act 5: fireworks and cake -------------------------------------------- */
+function openCelebration(){
+  replay.classList.remove('is-shown'); replay.hidden = true;
+  crackersFrame.classList.add('is-active'); cakeFrame.classList.remove('is-active');
+  cakeFrame.removeAttribute('src');
+  crackersFrame.src = crackersFrame.dataset.src;
+  celebration.classList.add('is-open'); celebration.setAttribute('aria-hidden', 'false');
+}
+
+function closeCelebration(){
+  celebration.classList.remove('is-open'); celebration.setAttribute('aria-hidden', 'true');
+}
+
+window.addEventListener('message', (event) => {
+  if (event.origin !== location.origin) return;
+  if (event.data?.type === 'birthday-crackers-complete'){
+    crackersFrame.classList.remove('is-active'); cakeFrame.classList.add('is-active');
+    cakeFrame.src = cakeFrame.dataset.src;
+  }
+  if (event.data?.type === 'birthday-cake-complete'){
+    closeCelebration();
+    openGallery();
+  }
+});
+
+/* --- Act 6: photo memories ------------------------------------------------ */
 const photoSlides = [...galleryTrack.querySelectorAll('.photo-slide')];
 let photoIndex = 0;
 let touchStartX = 0;
@@ -952,6 +980,7 @@ function startMusic(){
 /* back to Act 1, ready to be drawn again */
 function resetAll(){
   closeGallery();
+  closeCelebration();
   treeStop();
   showWish(false);
   window.bdayDone = false; replayArmed = false;
@@ -995,7 +1024,7 @@ if (reduceMotion){
   buildMotes();
   document.fonts && document.fonts.ready.then(() => { refreshRig(); setDraw(0); });
   enter();
-  replay.addEventListener('click', openGallery);
+  replay.addEventListener('click', openCelebration);
 }
 
 /* ============================================================
